@@ -26,7 +26,7 @@ class Slider {
         dataRange = [parseDate(this.dataRange[0]), parseDate(this.dataRange[1])];
         this.dataRange = [parseDate(this.dataRange[0]), parseDate(this.dataRange[1])];
 
-        if(this.dataRange[0] != dataRange[0] || this.dataRange[1] != dataRange[1]){
+        if (this.dataRange[0] != dataRange[0] || this.dataRange[1] != dataRange[1]) {
             this.currentRange = dataRange;
         }
         this.dataRange = dataRange;
@@ -53,11 +53,11 @@ class Slider {
             .attr('y', actualHeight + 30);
         const line = g.append('line')
             .attr('id', 'tracker')
-            .attr('x1', 10+x.range()[0])
-            .attr('x2', 10+x.range()[1]);
+            .attr('x1', 10 + x.range()[0])
+            .attr('x2', 10 + x.range()[1]);
 
         const brush = d3.brushX()
-            .extent([[20,0], [actualWidth, actualHeight]])
+            .extent([[20, 0], [actualWidth, actualHeight]])
             .on('brush', e => {
                 let sel = e.selection;
                 leftLabel.attr('x', sel[0])
@@ -68,7 +68,7 @@ class Slider {
                     .attr("transform", (d, i) => {
                         `translate([${sel[i]}, ${actualHeight / 4}])}`
                     });
-                this.callback([x.invert(sel[0]),x.invert(sel[1])]);
+                this.callback([x.invert(sel[0]), x.invert(sel[1])]);
                 this.svg.node().value = sel.map(d => x.invert(d));
                 this.svg.node().dispatchEvent(new CustomEvent("input"));
             });
@@ -78,7 +78,7 @@ class Slider {
             .call(brush);
 
         // https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a
-        var brushResizePath = function(d) {
+        var brushResizePath = function (d) {
             var e = +(d.type == "e"),
                 x = e ? 1 : -1,
                 y = height / 2;
@@ -88,7 +88,7 @@ class Slider {
         }
 
         const handle = sliderBrush.selectAll(".handle")
-            .data([{type:'w'}, {type:'e'}])
+            .data([{type: 'w'}, {type: 'e'}])
             .enter()
             .append('path')
             .attr('class', 'handle')
@@ -98,10 +98,12 @@ class Slider {
             .attr('d', brushResizePath);
 
         sliderBrush.selectAll(".brushOverlay")
-            .each(d => {d.type = "selection";})
+            .each(d => {
+                d.type = "selection";
+            })
             .on("mousedown touchstart", brushCenter);
 
-        function brushCenter(){
+        function brushCenter() {
             let dx = x(1) - x(0);
             let mouseCursor = d3.mouse(this)[0];
             let x0 = mouseCursor - dx / 2;

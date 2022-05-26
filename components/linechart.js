@@ -34,7 +34,7 @@ class LineChart {
         const parseDate = d3.timeParse('%Y-%m-%d');
 
         const usingData = this.data.map(d => {
-            return{
+            return {
                 date: parseDate(d["date"]),
                 state: d["posName"],
                 avgTemp: d["avgTemp"],
@@ -45,7 +45,7 @@ class LineChart {
 
         this.svg.selectAll('g').remove();
 
-        var statData = d3.group(usingData, d=> d.state);
+        var statData = d3.group(usingData, d => d.state);
 
         const actualWidth = this.width - margin.left - margin.right - 120;
         const actualHeight = this.height - margin.top - margin.bottom;
@@ -73,17 +73,21 @@ class LineChart {
         axes.append('g')
             .attr('class', 'x-axis')
             .attr('transform', 'translate(0,' + actualHeight + ')')
-            .call(xAxis);
+            .call(xAxis)
+        axes.append('text')
+            .attr('x', actualWidth)
+            .attr('y', actualHeight + 20)
+            .text('Date');
 
         axes.append('g')
             .attr('class', 'y-axis')
             .call(yAxis)
-            .append('text')
+        axes.append('text')
             .attr('transform', 'rotate(-90)')
             .attr('y', 6)
-            .attr('dy', '.5em')
+            .attr('dy', '.75em')
             .style('text-anchor', 'end')
-            .text('Date');
+            .text('Temperature(°C)');
 
 
         const categories = [...new Set(usingData.map(d => d.state))];
@@ -91,8 +95,8 @@ class LineChart {
         const colorsRaw = ["#3957ff", "#d3fe14", "#c9080a", "#fec7f8", "#0b7b3e", "#0bf0e9", "#c203c8", "#fd9b39", "#888593", "#906407", "#98ba7f", "#fe6794", "#10b0ff", "#ac7bff", "#fee7c0", "#964c63", "#1da49c",];
         const colorsRange = [];
         const colorsValue = [];
-        for(const x of colorsRaw){
-            colorsRange.push(`${x}${categories.length>5?(categories.length>10?3:5):(9-categories.length)}0`);
+        for (const x of colorsRaw) {
+            colorsRange.push(`${x}${categories.length > 5 ? (categories.length > 10 ? 3 : 5) : (9 - categories.length)}0`);
             colorsValue.push(`${x}`);
         }
 
@@ -104,21 +108,40 @@ class LineChart {
             .range(colorsValue);
 
         const legend = this.g.append('g');
+        legend.append('text')
+            .attr('x', this.width - 200)
+            .attr('y', 10)
+            .text("Range: Lowest Temperature ")
+            .style('font-size', 10);
+        legend.append('text')
+            .attr('x', this.width - 200 + 30)
+            .attr('y', 10 + 15)
+            .text("~ Highest Temperature")
+            .style('font-size', 10);
+        legend.append('text')
+            .attr('x', this.width - 200)
+            .attr('y', 10 + 25 + 10)
+            .text("Line: Average Temperature")
+            .style('font-size', 12);
         legend.selectAll(".legend_square")
             .data(categories)
             .enter()
-                .append('rect')
-                .attr('x', this.width - 200)
-                .attr('y', (d, i) => {return 10 + i*(25)})
-                .attr('width', 20)
-                .attr('height', 20)
-                .style('fill', d => valueColors(d));
+            .append('rect')
+            .attr('x', this.width - 200)
+            .attr('y', (d, i) => {
+                return 10 + (i + 2) * (25)
+            })
+            .attr('width', 20)
+            .attr('height', 20)
+            .style('fill', d => valueColors(d));
         legend.selectAll(".legend_text")
             .data(categories)
             .enter()
             .append('text')
-            .attr('x', this.width - 200 +20+5)
-            .attr('y', (d, i) => {return 10 + i*(25) + 10})
+            .attr('x', this.width - 200 + 20 + 5)
+            .attr('y', (d, i) => {
+                return 10 + (i + 2) * (25) + 10
+            })
             .text(d => d)
             .style('fill', d => valueColors(d))
             .style('text-anchor', 'left')
@@ -134,19 +157,23 @@ class LineChart {
         this.g.selectAll(".area")
             .data(statData)
             .enter()
-                .append("path")
-                .attr('d', d => highArea(d[1]))
-                .style('fill', d => {return rangeColors(d[0]);});
+            .append("path")
+            .attr('d', d => highArea(d[1]))
+            .style('fill', d => {
+                return rangeColors(d[0]);
+            });
 
         var valueLine = d3.line()
             .x(d => x(d.date))
-            .y(d=> y(+d.avgTemp));
+            .y(d => y(+d.avgTemp));
         this.g.selectAll(".line")
             .data(statData)
             .enter()
             .append("path")
             .attr('d', d => valueLine(d[1]))
-            .style('stroke', d => {return valueColors(d[0]);})
+            .style('stroke', d => {
+                return valueColors(d[0]);
+            })
             .style('stroke-width', 1)
             .style('fill', 'none');
 

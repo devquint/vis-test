@@ -1,8 +1,5 @@
 class KorMap {
-    constructor(target, data, selected, callback,
-                width = 700, height = 700,
-                scale = 5500,
-                offsetX = -11900, offsetY = 4050) {
+    constructor(target, data, selected, callback, width = 700, height = 700, scale = 5500, offsetX = -11900, offsetY = 4050) {
         this.target = target;
         this.data = data;
         this.selected = selected;
@@ -132,8 +129,7 @@ class KorMap {
             let properties = d.target.__data__.properties;
 
             tooltip
-                .html("Average temperature of " + properties.name + ": " + avgs[properties.name] + "°C")
-                .style("left", (d3.pointer(this)[0] + 70) + "px")
+                .html("Average temperature of " + properties.name + ": " + avgs[properties.name] + "°C").style("left", (d3.pointer(this)[0] + 70) + "px")
                 .style("top", (d3.pointer(this)[1]) + "px")
         };
         var mouseleave = function (d) {

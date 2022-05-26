@@ -1,178 +1,171 @@
 <!DOCTYPE html>
 <html lang="kr" dir="ltr">
-    <head>
-        <meta charset="utf-8" />
-        <title>Map</title>
-        <style>
-            #container {
-                width: 700px;
-                min-height: 700px;
-                float:left;
-                margin: 15px 35px;
-            }
-
-            .background {
-                fill: #ffffffff;
-            }
-
-            #states path{
-                stroke: #aaa;
-                stroke-width: 1.5px;
-            }
-
-            #states path:not(.state-selected){
-                fill: #666;
-            }
-
-            #states path:hover {
-                fill: rgba(239, 224, 131, 0.2);
-            }
-
-            #states .active {
-                fill: #00B700;
-            }
-
-            #states .activeDetail {
-                fill: #00B700;
-            }
-
-            #states path {
-                cursor: pointer;
-            }
-
-            #states text {
-                cursor: pointer;
-                font-size: 12px;
-                fill: #fff;
-                text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
-            }
-        </style>
-    </head>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-            crossorigin="anonymous"></script>
-
-    <script src="components/kor_map.js"></script>
-    <script src="components/linechart.js"></script>
-    <script src="components/datatable.js"></script>
-    <script src="components/slider.js"></script>
-    <body>
-        <div id="container"></div>
-        <div id="slider"></div>
-        <div id="linechart"></div>
-        <table class="table table-striped text-center">
-            <thead>
-            <tr>
-                <th>Position Code</th>
-                <th>Position Name</th>
-                <th>Date</th>
-                <th>Average Temperature</th>
-                <th>Highest Temperature</th>
-                <th>Highest Temperature time</th>
-                <th>Lowest Temperature</th>
-                <th>Lowest Temperature time</th>
-            </tr>
-            </thead>
-            <tbody id="data-table">
-
-            </tbody>
-        </table>
-    </body>
-
-    <script>
-        const STATES_MAP = new Map();
-        STATES_MAP.set(105, "강원도");
-        STATES_MAP.set(108, "서울특별시");
-        STATES_MAP.set(112, "인천광역시");
-        STATES_MAP.set(119, "경기도");
-        STATES_MAP.set(131, "충청북도");
-        STATES_MAP.set(133, "대전광역시");
-        STATES_MAP.set(143, "대구광역시");
-        STATES_MAP.set(146, "전라북도");
-        STATES_MAP.set(152, "울산광역시");
-        STATES_MAP.set(155, "경상남도");
-        STATES_MAP.set(156, "광주광역시");
-        STATES_MAP.set(159, "부산광역시");
-        STATES_MAP.set(174, "전라남도");
-        STATES_MAP.set(184, "제주특별자치도");
-        STATES_MAP.set(232, "충청남도");
-        STATES_MAP.set(239, "세종특별자치시");
-        STATES_MAP.set(283, "경상북도");
-
-        let filteredData, data, korMap, linechart, selectedData, dataTable, selected, slider, selectedDateRange;
-        const selectedMap = new Map();
-        for (const [key, value] of STATES_MAP.entries()){
-            selectedMap.set(value, true);
-        }
-        selected = selectedMap;
-
-
-        function updateAll(){
-            filteredData = data.filter(d => selectedMap.get(d["posName"])==true);
-            //slider.update(filteredData);
-
-            filteredData = filteredData.filter(
-                d=>(new Date(d['date']) >= selectedDateRange[0] && new Date(d['date']) <= selectedDateRange[1])
-            );
-
-            korMap.update(filteredData);
-            dataTable.update(filteredData, data.columns);
-            linechart.update(filteredData);
+<head>
+    <meta charset="utf-8"/>
+    <title>Map</title>
+    <style>
+        #container {
+            width: 700px;
+            min-height: 700px;
+            float: left;
+            margin: 15px 35px;
         }
 
-        function dataChanged(){
-            updateAll();
+        .background {
+            fill: #ffffffff;
         }
 
-        function sliderChanged(changedDateRange){
-            selectedDateRange = changedDateRange;
-            updateAll();
+        #states path {
+            stroke: #aaa;
+            stroke-width: 1.5px;
         }
 
-        d3.csv("https://raw.githubusercontent.com/devquint/vis-test/master/data/temp.csv").then(csvData => {
-            csvData.forEach(d => {
-                d["posCode"] = +d["posCode"];
-                d["posName"] = STATES_MAP.get(d["posCode"]);
-                d["avgTemp"] = +d["avgTemp"];
-                d["lowTemp"] = +d["lowTemp"];
-                d["lowTempTime"] = +d["lowTempTime"];
-                d["highTemp"] = +d["highTemp"];
-                d["highTempTime"] = +d["highTempTime"];
-                //d["date"] = new Date(d["date"]);
-            })
+        #states path:not(.state-selected) {
+            fill: #666;
+        }
 
-            data = csvData;
-            console.log(data);
+        #states path:hover {
+            fill: rgba(239, 224, 131, 0.2);
+        }
 
-            korMap = new KorMap("#container", data, selected, dataChanged);
-            korMap.initialize();
+        #states .active {
+            fill: #00B700;
+        }
 
-            dataTable = new DataTable('#data-table');
-            dataTable.update(data, data.columns);
+        #states .activeDetail {
+            fill: #00B700;
+        }
 
-            linechart = new LineChart('#linechart', data, selected);
-            linechart.initialize();
+        #states path {
+            cursor: pointer;
+        }
 
-            slider = new Slider("#slider",
-                [d3.min(data, d=> d['date']), d3.max(data, d => d['date'])],
-                sliderChanged
-            );
-            slider.initialize();
+        #states text {
+            cursor: pointer;
+            font-size: 12px;
+            fill: #fff;
+            text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+        }
+    </style>
+</head>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+<script src="components/kor_map.js"></script>
+<script src="components/linechart.js"></script>
+<script src="components/datatable.js"></script>
+<script src="components/slider.js"></script>
+<body>
+<div id="container"></div>
+<div id="slider"></div>
+<div id="linechart"></div>
+<table class="table table-striped text-center">
+    <thead>
+    <tr>
+        <th>Position Code</th>
+        <th>Position Name</th>
+        <th>Date(yyyy-mm-dd)</th>
+        <th>Average Temperature(°C)</th>
+        <th>Highest Temperature(°C)</th>
+        <th>Highest Temperature time(hhMM)</th>
+        <th>Lowest Temperature(°C)</th>
+        <th>Lowest Temperature time(hhMM)</th>
+    </tr>
+    </thead>
+    <tbody id="data-table">
+
+    </tbody>
+</table>
+</body>
+
+<script>
+    const STATES_MAP = new Map();
+    STATES_MAP.set(105, "강원도");
+    STATES_MAP.set(108, "서울특별시");
+    STATES_MAP.set(112, "인천광역시");
+    STATES_MAP.set(119, "경기도");
+    STATES_MAP.set(131, "충청북도");
+    STATES_MAP.set(133, "대전광역시");
+    STATES_MAP.set(143, "대구광역시");
+    STATES_MAP.set(146, "전라북도");
+    STATES_MAP.set(152, "울산광역시");
+    STATES_MAP.set(155, "경상남도");
+    STATES_MAP.set(156, "광주광역시");
+    STATES_MAP.set(159, "부산광역시");
+    STATES_MAP.set(174, "전라남도");
+    STATES_MAP.set(184, "제주특별자치도");
+    STATES_MAP.set(232, "충청남도");
+    STATES_MAP.set(239, "세종특별자치시");
+    STATES_MAP.set(283, "경상북도");
+
+    let filteredData, data, korMap, linechart, selectedData, dataTable, selected, slider, selectedDateRange;
+    const selectedMap = new Map();
+    for (const [key, value] of STATES_MAP.entries()) {
+        selectedMap.set(value, true);
+    }
+    selected = selectedMap;
+
+
+    function updateAll() {
+        filteredData = data.filter(d => selectedMap.get(d["posName"]) == true);
+        //slider.update(filteredData);
+
+        filteredData = filteredData.filter(
+            d => (new Date(d['date']) >= selectedDateRange[0] && new Date(d['date']) <= selectedDateRange[1])
+        );
+
+        korMap.update(filteredData);
+        dataTable.update(filteredData, data.columns);
+        linechart.update(filteredData);
+    }
+
+    function dataChanged() {
+        updateAll();
+    }
+
+    function sliderChanged(changedDateRange) {
+        selectedDateRange = changedDateRange;
+        updateAll();
+    }
+
+    d3.csv("https://raw.githubusercontent.com/devquint/vis-test/master/data/temp.csv").then(csvData => {
+        csvData.forEach(d => {
+            d["posCode"] = +d["posCode"];
+            d["posName"] = STATES_MAP.get(d["posCode"]);
+            d["avgTemp"] = +d["avgTemp"];
+            d["lowTemp"] = +d["lowTemp"];
+            d["lowTempTime"] = +d["lowTempTime"];
+            d["highTemp"] = +d["highTemp"];
+            d["highTempTime"] = +d["highTempTime"];
+            //d["date"] = new Date(d["date"]);
         })
 
+        data = csvData;
+        console.log(data);
+
+        korMap = new KorMap("#container", data, selected, dataChanged);
+        korMap.initialize();
+
+        dataTable = new DataTable('#data-table');
+        dataTable.update(data, data.columns);
+
+        linechart = new LineChart('#linechart', data, selected);
+        linechart.initialize();
+
+        slider = new Slider("#slider",
+            [d3.min(data, d => d['date']), d3.max(data, d => d['date'])],
+            sliderChanged
+        );
+        slider.initialize();
+    })
 
 
-
-
-    </script>
-
-
-
-
+</script>
 
 
 </html>
