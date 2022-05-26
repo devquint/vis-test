@@ -38,7 +38,7 @@ class KorMap {
             .attr('height', this.height + 'px');
 
         var projection = this.projection;
-        d3.json('data/korea.json').then(json => {
+        d3.json('https://raw.githubusercontent.com/devquint/vis-test/master/data/korea.json').then(json => {
             let selected = this.selected;
             var tmp = json;
             this.mapData = tmp;

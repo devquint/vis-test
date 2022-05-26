@@ -133,7 +133,7 @@
             updateAll();
         }
 
-        d3.csv("data/temp.csv").then(csvData => {
+        d3.csv("https://raw.githubusercontent.com/devquint/vis-test/master/data/temp.csv").then(csvData => {
             csvData.forEach(d => {
                 d["posCode"] = +d["posCode"];
                 d["posName"] = STATES_MAP.get(d["posCode"]);
